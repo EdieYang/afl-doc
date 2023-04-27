@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements  UserService{
 
     @Override
-    @Scene(entryPoint = "更新用户", subject = User.class )
+    @Scene(entryPoint = "更新用户", subject = User.class , caseW = "用户编辑")
     public void updateUser() {
 
     }
