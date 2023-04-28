@@ -116,7 +116,7 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
             methodMetadata.forEach(methodMeta -> {
                 Map<String, Object> annotationAttrs = methodMeta.getAnnotationAttributes(Scene.class.getName());
                 sceneModules.add(SceneModule.builder()
-                        .subject(((Class) annotationAttrs.get("subject")).getName())
+                        .subject(((Class<?>) annotationAttrs.get("subject")).getName())
                         .caseWhen((String) annotationAttrs.get("caseW"))
                         .entryMethod(methodMeta.getDeclaringClassName() + "#" + methodMeta.getMethodName())
                         .entryPoint((String) annotationAttrs.get("entryPoint"))
@@ -137,9 +137,9 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
         bizModules.forEach(biz -> {
 
             bd.title(biz.getSubjectName());
-            bd.subTitle(biz.getSubject());
-            bd.subTitle(biz.getDesc());
-            bd.subTitle(biz.getNote());
+            bd.subTitle("主体：" +biz.getSubject());
+            bd.subTitle("描述：" + biz.getDesc());
+            bd.subTitle("备注：" + biz.getNote());
             bd.link("参考文档", biz.getUrl());
             biz.getSceneModules().forEach(sceneModule -> {
                 MdKiller.SectionBuilder sectionBuilder = bd.ul();
