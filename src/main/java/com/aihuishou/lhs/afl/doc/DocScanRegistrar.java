@@ -118,7 +118,7 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
                 sceneModules.add(SceneModule.builder()
                         .subject(((Class<?>) annotationAttrs.get("subject")).getName())
                         .caseWhen((String) annotationAttrs.get("caseW"))
-                        .entryMethod(methodMeta.getDeclaringClassName() + "#" + methodMeta.getMethodName())
+                        .entryMethod(ClassUtils.getShortName(methodMeta.getDeclaringClassName()) + "#" + ClassUtils.getShortName(methodMeta.getReturnTypeName()) + " "+ methodMeta.getMethodName())
                         .entryPoint((String) annotationAttrs.get("entryPoint"))
                         .build());
             });
