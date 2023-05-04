@@ -21,5 +21,10 @@ public class AflDocAutoConfiguration {
         return new OnsScan();
     }
 
+    @Bean
+    @ConditionalOnProperty(value = "afl.doc.scan-doc.enabled")
+    public DocScanRegistrar docScanRegistrar() {
+        return new DocScanRegistrar();
+    }
 
 }

@@ -8,6 +8,7 @@ import com.aihuishou.lhs.afl.doc.modules.BizModule;
 import com.aihuishou.lhs.afl.doc.modules.SceneModule;
 import com.aihuishou.lhs.afl.doc.util.MdKiller;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -191,7 +192,9 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
     protected Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {
         Map<String, Object> attributes = importingClassMetadata
                 .getAnnotationAttributes(EnableAflDocScan.class.getCanonicalName());
-
+        if (MapUtils.isEmpty(attributes)) {
+            return Collections.emptySet();
+        }
         Set<String> basePackages = new HashSet<>();
         for (String pkg : (String[]) attributes.get("value")) {
             if (StringUtils.hasText(pkg)) {
@@ -203,7 +206,7 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
                 basePackages.add(pkg);
             }
         }
-        for (Class<?> clazz : (Class[]) attributes.get("basePackageClasses")) {
+        for (Class<?> clazz : (Class<?>[]) attributes.get("basePackageClasses")) {
             basePackages.add(ClassUtils.getPackageName(clazz));
         }
 

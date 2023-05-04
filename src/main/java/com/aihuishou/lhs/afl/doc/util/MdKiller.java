@@ -366,15 +366,18 @@ public class MdKiller {
                     StringJoiner titles = new StringJoiner(" | "), extras = new StringJoiner(" | ");
                     for (Object t : tableData[0]) {
                         titles.add(t != null ? t.toString() : "");
-                        extras.add("-");
+                        extras.add(":-----");
                     }
-                    latestData.append("\n\n").append(titles).append('\n').append(extras);
+                    latestData.append("\n\n")
+                            .append(" | ").append(titles).append(" | ")
+                            .append('\n')
+                            .append(" | ").append(extras).append(" | ");
                     for (int i = 1; i < tableData.length; i++) {
                         StringJoiner dataJoiner = new StringJoiner(" | ");
                         for (int j = 0; j < tableData[i].length; j++) {
                             dataJoiner.add(tableData[i][j] != null ? tableData[i][j].toString() : "");
                         }
-                        latestData.append('\n').append(dataJoiner);
+                        latestData.append('\n').append(" | ").append(dataJoiner).append(" | ");
                     }
                 }
             }
@@ -623,7 +626,7 @@ public class MdKiller {
         }
 
         public SectionBuilder link(String name, String url) {
-            if (StringUtils.hasText(name)) {
+            if (!StringUtils.hasText(name)) {
                 name = url;
             }
             if (StringUtils.hasText(url)) {
