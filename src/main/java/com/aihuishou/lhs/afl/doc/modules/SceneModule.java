@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 场景模块
  *
@@ -37,4 +39,24 @@ public class SceneModule {
      * 入口方法
      */
     private String entryMethod;
+
+    /**
+     * 外部链接
+     */
+    private List<SceneLink> links;
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    public static class SceneLink {
+
+        /**
+         * 外链名称
+         */
+        private String name;
+        /**
+         * 外链地址
+         */
+        private String link;
+    }
 }

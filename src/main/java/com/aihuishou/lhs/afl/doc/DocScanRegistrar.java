@@ -7,6 +7,9 @@ import com.aihuishou.lhs.afl.doc.filter.MethodAnnotationTypeFilter;
 import com.aihuishou.lhs.afl.doc.modules.BizModule;
 import com.aihuishou.lhs.afl.doc.modules.SceneModule;
 import com.aihuishou.lhs.afl.doc.util.MdKiller;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.EnvironmentAware;
@@ -14,6 +17,7 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ScannedGenericBeanDefinition;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
@@ -40,6 +44,7 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
     private Environment environment;
     private ResourceLoader resourceLoader;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocScanRegistrar.class);
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
@@ -67,7 +72,7 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
         try {
             markdown(bizModules);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("afl doc generate occur an error :{}", e.getMessage(), e);
         }
     }
 
@@ -117,15 +122,33 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
                 Map<String, Object> annotationAttrs = methodMeta.getAnnotationAttributes(Scene.class.getName());
                 sceneModules.add(SceneModule.builder()
                         .subject(((Class<?>) annotationAttrs.get("subject")).getName())
-                        .caseWhen((String) annotationAttrs.get("caseW"))
-                        .entryMethod(ClassUtils.getShortName(methodMeta.getDeclaringClassName()) + "#" + ClassUtils.getShortName(methodMeta.getReturnTypeName()) + " "+ methodMeta.getMethodName())
+                        .caseWhen((String) annotationAttrs.get("caseWhen"))
+                        .entryMethod(ClassUtils.getShortName(methodMeta.getDeclaringClassName()) + "#" + ClassUtils.getShortName(methodMeta.getReturnTypeName()) + " " + methodMeta.getMethodName())
                         .entryPoint((String) annotationAttrs.get("entryPoint"))
+                        .links(buildLinks((AnnotationAttributes[]) annotationAttrs.get("links")))
                         .build());
             });
         });
 
         return sceneModules;
+    }
 
+    private List<SceneModule.SceneLink> buildLinks(AnnotationAttributes[] links) {
+
+        if (links == null || links.length == 0) {
+            return Collections.emptyList();
+        }
+        List<SceneModule.SceneLink> sceneLinks = new ArrayList<>();
+        for (AnnotationAttributes link : links) {
+            SceneModule.SceneLink sceneLink = SceneModule.SceneLink.builder()
+                    .name(String.valueOf(link.get("name")))
+                    .link(String.valueOf(link.get("url")))
+                    .build();
+
+            sceneLinks.add(sceneLink);
+        }
+
+        return sceneLinks;
     }
 
     private void markdown(List<BizModule> bizModules) throws IOException {
@@ -135,9 +158,8 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
         bd.br();
 
         bizModules.forEach(biz -> {
-
             bd.title(biz.getSubjectName());
-            bd.subTitle("主体：" +biz.getSubject());
+            bd.subTitle("主体：" + biz.getSubject());
             bd.subTitle("描述：" + biz.getDesc());
             bd.subTitle("备注：" + biz.getNote());
             bd.link("参考文档", biz.getUrl());
@@ -146,6 +168,14 @@ public class DocScanRegistrar implements ImportBeanDefinitionRegistrar,
                 sectionBuilder.subTitle("场景：" + sceneModule.getEntryPoint());
                 sectionBuilder.ul().text("场景前提：" + sceneModule.getCaseWhen());
                 sectionBuilder.ul().text("入口方法：" + sceneModule.getEntryMethod());
+                if (CollectionUtils.isNotEmpty(sceneModule.getLinks())) {
+                    for (SceneModule.SceneLink link : sceneModule.getLinks()) {
+                        sectionBuilder.ul().text("外部链接：");
+                        sectionBuilder.ul().ul().link(link.getName(), link.getLink());
+                    }
+                }
+
+                sectionBuilder.endUl();
                 bd.endUl();
             });
         });

@@ -14,6 +14,7 @@
     <description>afl-doc</description>
     <properties>
         <java.version>8</java.version>
+        <com.aihuishou.common-mq.version>2.0.10</com.aihuishou.common-mq.version>
     </properties>
     <dependencies>
         <dependency>
@@ -37,6 +38,29 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.aihuishou</groupId>
+            <artifactId>common-mq</artifactId>
+            <version>${com.aihuishou.common-mq.version}</version>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

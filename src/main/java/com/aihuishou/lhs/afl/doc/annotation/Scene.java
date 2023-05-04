@@ -24,14 +24,37 @@ public @interface Scene {
     Class subject();
 
     /**
-     * 场景前提
-     */
-    String caseW() default "";
-
-    /**
      * 入口说明
      *
      * @return
      */
     String entryPoint();
+
+    /**
+     * 场景前提
+     */
+    String caseWhen() default "";
+
+    /**
+     * 外部链接
+     *
+     * @return
+     */
+    Link[] links() default {};
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({})
+    @interface Link {
+        /**
+         * 链接名
+         * @return
+         */
+        String name() default "";
+
+        /**
+         * 链接url
+         * @return
+         */
+        String url() default "";
+    }
 }
